@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment variables 
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files (optional but professional)
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp
+
+
+# Test files
+generate-hash.js
+test-bcrypt.js
+verify-hash.js
+check-password.js
