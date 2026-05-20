@@ -159,35 +159,64 @@
         .sub-section {
             margin-top: 20px;
         }
+
+        /* Billing section styles */
+        .billing-card {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        .billing-card h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .bill-content {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .payment-success { color: #27ae60; }
+        .payment-error { color: #e74c3c; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>🏨 Hotel Management System - Admin Panel</h1>
     
-<div id="authSection" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 450px; text-align: center;">
-        <h1 style="color: #2c3e50; margin-bottom: 10px;">🏨 Hotel Management</h1>
-        <h2 style="color: #667eea; margin-bottom: 30px; font-size: 24px;">Login to Dashboard</h2>
-        
-        <div style="text-align: left;">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Email Address</label>
-                <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;">
+    <div id="authSection" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 450px; text-align: center;">
+            <div style="margin-bottom: 30px;">
+                <div style="font-size: 60px; margin-bottom: 10px;">🏨</div>
+                <h1 style="color: #2c3e50; margin: 0; font-size: 28px;">Hotel Management</h1>
+                <h2 style="color: #667eea; margin: 10px 0 0; font-size: 20px; font-weight: normal;">Login to Dashboard</h2>
             </div>
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;">
+            
+            <div style="text-align: left;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">📧 Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: all 0.3s;">
+                </div>
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">🔒 Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: all 0.3s;">
+                </div>
+                <button onclick="login()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;">🔐 Login</button>
+                <p id="authMsg" style="margin-top: 20px; text-align: center; color: #e74c3c; font-size: 14px;"></p>
             </div>
-            <button onclick="login()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">Login</button>
-            <p id="authMsg" style="margin-top: 20px; text-align: center; color: #e74c3c;"></p>
-        </div>
-        
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="font-size: 12px; color: #666;">Demo Credentials: tushar@example.com / admin123</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="font-size: 12px; color: #666; margin: 0;">
+                    💡 Demo: tushar@example.com / admin123
+                </p>
+            </div>
         </div>
     </div>
-</div>
     
     <div id="dashboard" style="display:none;">
         <h2>Welcome, <span id="userName"></span> <button onclick="logout()" style="background: #95a5a6;">Logout</button></h2>
@@ -275,6 +304,45 @@
             <p id="bookingMsg"></p>
         </div>
         
+        <!-- Billing & Payment Section - NEW -->
+        <div class="section">
+            <h3>💰 Billing & Payment</h3>
+            
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <!-- Record Payment Card -->
+                <div class="billing-card">
+                    <h4>💵 Record Payment</h4>
+                    <div class="form-row">
+                        <select id="paymentBookingSelect" style="flex: 2;">
+                            <option value="">-- Select Booking ID --</option>
+                        </select>
+                        <input type="number" id="paymentAmount" placeholder="Amount ($)" style="flex: 1;">
+                        <select id="paymentMethod" style="flex: 1;">
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="online">Online</option>
+                        </select>
+                        <button onclick="recordPayment()" style="background: #27ae60;">💵 Record Payment</button>
+                    </div>
+                    <p id="paymentMsg" style="margin-top: 10px; font-size: 12px;"></p>
+                </div>
+                
+                <!-- View Bill Card -->
+                <div class="billing-card">
+                    <h4>📄 View Bill</h4>
+                    <div class="form-row">
+                        <select id="billBookingSelect" style="flex: 2;">
+                            <option value="">-- Select Booking ID --</option>
+                        </select>
+                        <button onclick="viewBill()" style="background: #3498db;">📄 Get Bill</button>
+                    </div>
+                    <div id="billDetails" style="margin-top: 15px; display: none;">
+                        <div id="billContent" class="bill-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Bookings Section -->
         <div class="section">
             <h3>📊 Recent Bookings</h3>
@@ -310,18 +378,15 @@
     
     // Check token on page load
     if(token) {
-        // Don't show dashboard immediately, verify token first
         verifyTokenAndShow();
     }
 
     async function verifyTokenAndShow() {
         try {
-            // Test if token is valid by fetching rooms
             const res = await fetch('/api/rooms', { 
                 headers: { 'Authorization': `Bearer ${token}` } 
             });
             if(res.status === 401) {
-                // Token invalid, clear it
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 token = null;
@@ -375,7 +440,6 @@
     }
 
     function showDashboard() {
-        // Hide login, show dashboard
         const authSection = document.getElementById('authSection');
         const dashboard = document.getElementById('dashboard');
         
@@ -386,10 +450,10 @@
         const userNameSpan = document.getElementById('userName');
         if(userNameSpan) userNameSpan.innerText = user.name || 'Admin';
         
-        // Fetch data with a small delay to ensure DOM is ready
         setTimeout(() => {
             fetchRooms();
             fetchBookings();
+            populateBookingDropdowns();
         }, 100);
     }
 
@@ -587,7 +651,6 @@
                 });
                 displayRooms();
                 
-                // Also update the booking dropdown
                 const roomTypeSelect = document.getElementById('roomTypeSelect');
                 if(roomTypeSelect && roomTypeSelect.value) {
                     loadRoomsByType();
@@ -704,6 +767,7 @@
                 alert('Booking created successfully!');
                 fetchBookings();
                 fetchRooms();
+                populateBookingDropdowns();
                 document.getElementById('guestName').value = '';
                 document.getElementById('guestEmail').value = '';
                 document.getElementById('roomTypeSelect').value = '';
@@ -781,31 +845,227 @@
                         }
                     });
                 }
+                
+                // Populate payment/bill dropdowns after fetching bookings
+                populateBookingDropdowns();
             }
         } catch(err) {
             console.error('Error fetching bookings:', err);
         }
     }
-
-    async function cancelBooking(id) {
-        if(confirm('Cancel this booking?')) {
-            try {
-                const res = await fetch(`/api/bookings/${id}`, { 
-                    method: 'DELETE', 
-                    headers: { 'Authorization': `Bearer ${token}` } 
-                });
-                const data = await res.json();
-                if(data.success) {
-                    fetchBookings();
-                    fetchRooms();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch(err) {
-                alert('Error: ' + err.message);
+async function cancelBooking(id) {
+    if(confirm('Cancel this booking?')) {
+        try {
+            const res = await fetch(`/api/bookings/${id}`, { 
+                method: 'DELETE', 
+                headers: { 'Authorization': `Bearer ${token}` } 
+            });
+            const data = await res.json();
+            if(data.success) {
+                fetchBookings();
+                fetchRooms();
+                populateBookingDropdowns();  // this will remove the cancelled booking from dropdowns
+            } else {
+                alert('Error: ' + data.message);
             }
+        } catch(err) {
+            alert('Error: ' + err.message);
         }
     }
+}
+
+    // ========== BILLING & PAYMENT FUNCTIONS ==========
+    
+async function populateBookingDropdowns() {
+    try {
+        const [bookingsRes, paymentsRes] = await Promise.all([
+            fetch('/api/bookings', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('/api/payments', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+        
+        const bookingsData = await bookingsRes.json();
+        let paymentsData = { data: [] };
+        if (paymentsRes.ok) paymentsData = await paymentsRes.json();
+        
+        if (bookingsData.success) {
+            // Exclude cancelled bookings
+            const activeBookings = bookingsData.data.filter(b => b.status !== 'cancelled');
+            
+            // Build payment map (total paid per booking)
+            const paymentMap = {};
+            if (paymentsData.data && Array.isArray(paymentsData.data)) {
+                paymentsData.data.forEach(p => {
+                    if (p.status !== 'completed') return;
+                    if (!paymentMap[p.booking_id]) paymentMap[p.booking_id] = 0;
+                    paymentMap[p.booking_id] += parseFloat(p.amount);
+                });
+            }
+            
+            const paymentSelect = document.getElementById('paymentBookingSelect');
+            const billSelect = document.getElementById('billBookingSelect');
+            
+            if (paymentSelect) {
+                paymentSelect.innerHTML = '<option value="">-- Select Booking ID --</option>';
+                activeBookings.forEach(booking => {
+                    const totalPaid = paymentMap[booking.id] || 0;
+                    const remaining = parseFloat(booking.total_price) - totalPaid;
+                    const option = document.createElement('option');
+                    option.value = booking.id;
+                    option.text = `#${booking.id} - ${booking.guest_name} (Room ${booking.room_number}) - $${booking.total_price} | Remaining: $${remaining.toFixed(2)}`;
+                    paymentSelect.appendChild(option);
+                });
+            }
+            
+            if (billSelect) {
+                billSelect.innerHTML = '<option value="">-- Select Booking ID --</option>';
+                activeBookings.forEach(booking => {
+                    const option = document.createElement('option');
+                    option.value = booking.id;
+                    option.text = `#${booking.id} - ${booking.guest_name} (Room ${booking.room_number})`;
+                    billSelect.appendChild(option);
+                });
+            }
+        }
+    } catch(err) {
+        console.error('Error populating booking dropdowns:', err);
+    }
+}
+
+async function recordPayment() {
+    const booking_id = document.getElementById('paymentBookingSelect').value;
+    const amount = document.getElementById('paymentAmount').value;
+    const payment_method = document.getElementById('paymentMethod').value;
+    const paymentMsg = document.getElementById('paymentMsg');
+    const recordBtn = document.querySelector('#paymentSection .billing-card button');
+
+    if (!booking_id || !amount) {
+        paymentMsg.innerHTML = '<span style="color: #e74c3c;">❌ Please select booking and enter amount</span>';
+        return;
+    }
+    
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+        paymentMsg.innerHTML = '<span style="color: #e74c3c;">❌ Please enter a valid positive amount</span>';
+        return;
+    }
+
+    if (recordBtn) recordBtn.disabled = true;
+
+    try {
+        // ✅ No overpayment check – any positive amount is allowed (including extras)
+        const res = await fetch('/api/payments', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ booking_id, amount: amountNum, payment_method })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            paymentMsg.innerHTML = '<span style="color: #27ae60;">✅ Payment recorded successfully!</span>';
+            document.getElementById('paymentAmount').value = '';
+            
+            // Small delay to ensure DB commit, then refresh UI
+            await new Promise(resolve => setTimeout(resolve, 200));
+            await fetchBookings();            // update recent bookings table
+            await populateBookingDropdowns(); // update dropdown remaining balances
+            
+            // If the same booking is currently shown in bill view, refresh it
+            const currentBillSelect = document.getElementById('billBookingSelect').value;
+            if (currentBillSelect == booking_id) {
+                viewBill();
+            }
+            
+            setTimeout(() => {
+                paymentMsg.innerHTML = '';
+            }, 3000);
+        } else {
+            paymentMsg.innerHTML = '<span style="color: #e74c3c;">❌ Error: ' + (data.message || 'Unknown error') + '</span>';
+        }
+    } catch(err) {
+        paymentMsg.innerHTML = '<span style="color: #e74c3c;">❌ Network error: ' + err.message + '</span>';
+    } finally {
+        if (recordBtn) recordBtn.disabled = false;
+    }
+}
+
+
+
+// ========== MODIFIED viewBill FUNCTION ==========
+async function viewBill() {
+    const booking_id = document.getElementById('billBookingSelect').value;
+    if (!booking_id) {
+        alert('Please select a booking');
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/payments/bill/${booking_id}`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const data = await res.json();
+        if(data.success) {
+            const bill = data.data;
+            const totalPrice = parseFloat(bill.total_price);
+            const totalPaid = parseFloat(bill.total_paid);
+            let additionalPaid = totalPaid - totalPrice;
+            if (additionalPaid < 0) additionalPaid = 0;   // ignore underpayment (should not happen)
+            
+            const billDiv = document.getElementById('billDetails');
+            const billContent = document.getElementById('billContent');
+            
+            let paymentsHtml = '';
+            if (bill.payments.length > 0) {
+                paymentsHtml = bill.payments.map(p => 
+                    `<li>$${parseFloat(p.amount).toFixed(2)} - ${p.payment_method} (${new Date(p.payment_date).toLocaleDateString()})</li>`
+                ).join('');
+            } else {
+                paymentsHtml = '<li>No payments yet</li>';
+            }
+            
+            let additionalHtml = '';
+            if (additionalPaid > 0) {
+                additionalHtml = `<p><strong>💳 Additional paid (extras):</strong> $${additionalPaid.toFixed(2)}</p>`;
+            }
+            
+            let dueAmount = totalPrice - totalPaid;
+            let dueHtml = '';
+            if (dueAmount > 0) {
+                dueHtml = `<p><strong>⚠️ Due Amount:</strong> <strong style="color: #e74c3c;">$${dueAmount.toFixed(2)}</strong></p>`;
+            } else {
+                dueHtml = `<p><strong style="color: #27ae60;">✅ Fully paid! No dues remaining.</strong></p>`;
+            }
+            
+            billContent.innerHTML = `
+                <div style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: #2c3e50;">🧾 Bill for Booking #${bill.booking.id}</h4>
+                </div>
+                <p><strong>👤 Guest:</strong> ${bill.booking.guest_name}</p>
+                <p><strong>📧 Email:</strong> ${bill.booking.guest_email}</p>
+                <p><strong>🏨 Room:</strong> ${bill.booking.room_number} (${bill.booking.type})</p>
+                <p><strong>📅 Dates:</strong> ${formatDate(bill.booking.check_in)} to ${formatDate(bill.booking.check_out)}</p>
+                <p><strong>💰 Room Price:</strong> $${totalPrice.toFixed(2)}</p>
+                <hr style="margin: 10px 0;">
+                <p><strong>💵 Payments Made:</strong></p>
+                <ul style="margin: 5px 0 10px 20px;">
+                    ${paymentsHtml}
+                </ul>
+                ${additionalHtml}
+                <p><strong>💳 Total Paid:</strong> $${totalPaid.toFixed(2)}</p>
+                ${dueHtml}
+                ${dueAmount > 0 ? '<p style="font-size: 12px; color: #666;">💡 Record additional payment above.</p>' : ''}
+            `;
+            billDiv.style.display = 'block';
+        } else {
+            alert('Error fetching bill: ' + data.message);
+        }
+    } catch(err) {
+        alert('Error: ' + err.message);
+    }
+}
+
 </script>
 </body>
 </html>

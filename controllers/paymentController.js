@@ -1,23 +1,16 @@
 const pool = require('../config/db');
 
-// Record a payment for a booking
+// Record a payment for a booking – now allows any amount (extras)
 const createPayment = async (req, res) => {
     const { booking_id, amount, payment_method } = req.body;
     try {
-        // Get booking details
+        // Check if booking exists
         const [bookingRows] = await pool.query('SELECT total_price FROM bookings WHERE id = ?', [booking_id]);
-        if (bookingRows.length === 0) return res.status(404).json({ success: false, message: 'Booking not found' });
-        const totalDue = parseFloat(bookingRows[0].total_price);
-        
-        // Get total paid so far
-        const [paidRows] = await pool.query('SELECT SUM(amount) as total_paid FROM payments WHERE booking_id = ? AND status = "completed"', [booking_id]);
-        const totalPaid = paidRows[0].total_paid || 0;
-        
-        const newAmount = parseFloat(amount);
-        if (totalPaid + newAmount > totalDue) {
-            return res.status(400).json({ success: false, message: `Payment exceeds remaining balance. Remaining: ${(totalDue - totalPaid).toFixed(2)}` });
+        if (bookingRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
         }
         
+        // ✅ No overpayment check – any positive amount is accepted (room + extras)
         const [result] = await pool.query(
             'INSERT INTO payments (booking_id, amount, payment_method, status) VALUES (?, ?, ?, "completed")',
             [booking_id, amount, payment_method]
@@ -25,11 +18,12 @@ const createPayment = async (req, res) => {
         const [newPayment] = await pool.query('SELECT * FROM payments WHERE id = ?', [result.insertId]);
         res.status(201).json({ success: true, data: newPayment[0] });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
-// Get bill: total cost, payments made, due amount
+// Get bill: total cost, payments made, due amount (due will be zero if total_paid >= total_price)
 const getBill = async (req, res) => {
     const { id } = req.params; // booking id
     try {
@@ -52,12 +46,25 @@ const getBill = async (req, res) => {
                 payments: paymentRows,
                 total_price: parseFloat(booking.total_price),
                 total_paid: totalPaid,
-                due_amount: due > 0 ? due : 0
+                due_amount: due > 0 ? due : 0   // never negative
             }
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
-module.exports = { createPayment, getBill };
+
+// Get all payments (for dropdown population)
+const getAllPayments = async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM payments ORDER BY payment_date DESC');
+        res.json({ success: true, data: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+module.exports = { createPayment, getBill,  getAllPayments };

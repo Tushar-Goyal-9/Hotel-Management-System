@@ -1,11 +1,12 @@
 const express = require('express');
-const { createPayment, getBill } = require('../controllers/paymentController');
+const { createPayment, getBill, getAllPayments } = require('../controllers/paymentController');
 const { authenticate } = require('../middleware/auth');
 const { body, param } = require('express-validator');
 const { validate } = require('../middleware/validation');
 const router = express.Router();
 
 router.use(authenticate);
+router.get('/', getAllPayments);   // <-- new route
 router.post('/', [
     body('booking_id').isInt(),
     body('amount').isNumeric(),
