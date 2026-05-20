@@ -3,7 +3,6 @@
 A **backend-focused** hotel management system built with **Node.js**, **Express.js**, and **MySQL**.  
 Includes a **functional admin dashboard** (HTML/CSS/JS) for demonstration and real-time testing of all backend features.
 
-> ⚡ **Note:** This project is primarily backend-driven. The frontend dashboard is kept simple to focus on core backend functionality – authentication, room/booking management, double-booking prevention, and billing logic.
 
 ---
 
@@ -141,15 +140,17 @@ hotel-management-system/
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/payments` | POST | Record payment against booking |
+| `/api/payments` | POST | Record payment against booking (any amount, room + extras) |
+| `/api/payments` | GET | Fetch all payments |
 | `/api/payments/bill/:bookingId` | GET | Get complete bill |
 
 **Features:**
-- Calculate total stay cost (nights × price)
+- Calculate total stay cost (nights × room price per night)
+- **Allow extra payments** – After room price is fully paid, additional amounts are treated as “extras” (e.g., food, drinks, services)
 - Track multiple payments per booking
-- Prevent overpayment (validation)
-- Show due amount after payments
+- Bill clearly separates **Room Price**, **Additional paid (extras)**, and **Total Paid**
 - Payment methods: cash, card, online
+- No overpayment errors – any positive amount is accepted
 
 ---
 
@@ -180,12 +181,24 @@ The dashboard is a **demonstration UI** to test and showcase backend functionali
 - Visual status badges (Available/Booked/Free/Maintenance)
 
 ### Booking Creation
-- **Two-level categorized dropdown:**
+- **Dropdown:**
   1. Select room type
   2. Select specific free room (auto-populated)
 - Date pickers for check-in/check-out
 - Automatic total price calculation (backend)
 - Real-time availability check
+  
+### Billing & Payment 
+- Record payments for any confirmed booking
+- **Extras allowed** – even after room price is fully paid, extra payments can be added (food, laundry, etc.)
+- Bill view shows:
+  - Room price
+  - List of all payments with date & method
+  - **Additional paid (extras)** – the amount over the room price
+  - Total paid
+  - Due amount (zero if room price covered)
+- Dropdowns exclude cancelled bookings and show remaining room balance
+- Real‑time refresh after each payment
 
 ### Booking Management
 - View all bookings with status badges
@@ -311,14 +324,11 @@ npm start
 | JWT Authentication | Token generation, verification, protected routes |
 | Password Security | bcrypt hashing, no plain-text password storage |
 | Database Normalization | 4 tables with proper relationships |
-| Foreign Key Constraints | Data integrity using `ON DELETE RESTRICT` |
 | Query Optimization | Composite index for faster availability checks |
 | Double-Booking Prevention | Overlapping date SQL validation |
-| Request Validation | `express-validator` middleware |
 | Error Handling | Global error handler with consistent API responses |
-| Pagination | `limit` and `offset` support |
-| Environment Configuration | Separate configs for development and production |
 | MVC Architecture | Clear separation of controllers, models, and routes |
+| Extras / Overpayment Handling | Allow additional payments beyond room price, shown as "Additional paid (extras)" in bill |
 
 ---
 
