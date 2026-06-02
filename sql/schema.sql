@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS payments (
 
 -- Insert default admin (password: admin123)
 INSERT INTO users (name, email, password_hash) 
-VALUES ('Admin', 'tushar@example.com', '$2b$10$7uY9J5kqGgWxgYQfHqM5V.O0p1WdqH6Z5nKjLqE8xP3cFvB6yRzU2');
+VALUES ('Admin', 'tushar@example.com', '$2b$10$UUXtcistMt3BD.zi0FVzEesGWRcNs/sCmEEvkDAfZOrFu5fG.NhMS');
 -- (bcrypt hash of "admin123" – you can regenerate with bcryptjs)
 
 -- Insert sample rooms
