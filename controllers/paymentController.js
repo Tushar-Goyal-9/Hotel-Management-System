@@ -12,9 +12,9 @@ const createPayment = async (req, res) => {
         
         // ✅ No overpayment check – any positive amount is accepted (room + extras)
         const [result] = await pool.query(
-            'INSERT INTO payments (booking_id, amount, payment_method, status) VALUES (?, ?, ?, "completed")',
-            [booking_id, amount, payment_method]
-        );
+    "INSERT INTO payments (booking_id, amount, payment_method, status) VALUES (?, ?, ?, 'completed')",
+    [booking_id, amount, payment_method]
+);
         const [newPayment] = await pool.query('SELECT * FROM payments WHERE id = ?', [result.insertId]);
         res.status(201).json({ success: true, data: newPayment[0] });
     } catch (err) {
