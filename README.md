@@ -1,50 +1,81 @@
-# 🏨 Hotel Management System – Backend with Admin Dashboard
+# 🏨 Hotel Management System – Backend REST API & Admin Dashboard
 
-A **backend-focused** hotel management system built with **Node.js**, **Express.js**, and **MySQL**.  
-Includes a **functional admin dashboard** (HTML/CSS/JS) for demonstration and real-time testing of all backend features.
+![Node.js](https://img.shields.io/badge/Node.js-v16+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-5.x-000000?style=for-the-badge&logo=express&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-Authentication-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
+A production-ready **backend-focused** hotel management system built with **Node.js**, **Express.js**, and **MySQL**. Includes a **functional single-page admin dashboard** (HTML/CSS/JS) for demonstration, real-time testing, and end-to-end evaluation of all backend features.
 
 ---
 
 ## 📌 Project Overview
 
-This project demonstrates backend development skills through a complete hotel management system:
+This project showcases production-grade backend engineering practices:
 
-- **Admin authentication** using JWT (JSON Web Tokens)
-- **Room management** – CRUD operations with pagination
-- **Booking system** – Create, update, cancel with automatic price calculation
-- **Double-booking prevention** – Real-time room availability checking
-- **Billing & payments** – Track payments, calculate due amounts
-- **RESTful API design** – Clean, consistent endpoint structure
-- **Admin dashboard** – Simple UI to test and demonstrate all features
+- 🔐 **JWT Authentication & Security** – Password hashing with `bcryptjs`, environment separation, protected API routes.
+- 🏨 **Room Management API** – Full CRUD operations, filtering by room type, searching, column sorting, and pagination.
+- 📅 **Booking Engine Logic** – Real-time availability verification, **double-booking prevention** via SQL date-overlap logic (`check_in < new_checkout AND check_out > new_checkin`), and auto total price calculation.
+- 💳 **Billing & Multi-Payment System** – Multi-payment recording per booking, support for room payments and additional services (extras), automatic due amount computation.
+- 🛡️ **Request Validation & Error Handling** – Middleware input validation using `express-validator` and centralized error handling.
+- 🖥️ **Admin Demonstration UI** – Responsive, real-time dashboard to test and interact with all backend endpoints.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Architecture
 
 ### Backend (Core Focus)
 | Technology | Purpose |
 |------------|---------|
-| **Node.js** | JavaScript runtime |
-| **Express.js** | REST API framework |
-| **MySQL** | Relational database |
-| **JWT** | Authentication |
-| **bcryptjs** | Password hashing |
-| **dotenv** | Environment configuration |
+| **Node.js** | JavaScript runtime environment |
+| **Express.js (v5)** | REST API routing & middleware architecture |
+| **MySQL (v8)** | Relational database management system |
+| **mysql2/promise** | Asynchronous MySQL connection pooling |
+| **JWT (jsonwebtoken)** | Secure stateless session tokens (8h expiration) |
+| **bcryptjs** | Password hashing algorithm |
+| **express-validator** | Request payload sanitizer & validator |
+| **dotenv** | Environment variable management |
 
 ### Dashboard (Demonstration UI)
 | Technology | Purpose |
 |------------|---------|
-| **HTML5** | Structure |
-| **CSS3** | Styling with professional design |
-| **Vanilla JavaScript** | API integration, dynamic updates |
+| **HTML5 & CSS3** | Clean, responsive modern layout |
+| **Vanilla JavaScript** | Asynchronous Fetch API client with `localStorage` token management |
 
-### Development
-| Tool | Purpose |
-|------|---------|
-| **Nodemon** | Auto-restart during development |
-| **MySQL Workbench** | Database management |
-| **Git & GitHub** | Version control |
+---
+
+## 🏗️ System Architecture & Data Flow
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│              Client / Dashboard / Postman               │
+└────────────────────────────┬────────────────────────────┘
+                             │ (HTTP / Bearer Token)
+                             ▼
+┌─────────────────────────────────────────────────────────┐
+│                 Express App (server.js)                 │
+├────────────────────────────┬────────────────────────────┤
+│  Middleware: CORS, JSON    │  Static Dashboard Host     │
+└────────────────────────────┬────────────────────────────┘
+                             │
+     ┌───────────────────────┴───────────────────────┐
+     ▼                                               ▼
+[ Auth Routes ]                              [ Protected Routes ]
+  POST /api/auth/login                         /api/rooms, /api/bookings, /api/payments
+                                                     │
+                                                     ▼
+                                           [ validation.js & auth.js ]
+                                           (express-validator & JWT Verification)
+                                                     │
+                                                     ▼
+                                           [ Controllers (Business Logic) ]
+                                           (roomController, bookingController, paymentController)
+                                                     │
+                                                     ▼ (Connection Pool)
+                                           [ MySQL Relational Database ]
+                                           (users, rooms, bookings, payments)
+```
 
 ---
 
@@ -54,44 +85,45 @@ This project demonstrates backend development skills through a complete hotel ma
 hotel-management-system/
 │
 ├── config/
-│   └── db.js                    # MySQL connection pool
+│   └── db.js                    # MySQL connection pool & SSL settings
 │
-├── controllers/                  # Business logic
-│   ├── authController.js        # Login, JWT generation
-│   ├── roomController.js        # Room CRUD + availability
-│   ├── bookingController.js     # Booking CRUD + double-booking prevention
-│   └── paymentController.js     # Payment recording, billing
+├── controllers/                 # Core business logic layer
+│   ├── authController.js        # Admin login & JWT issuance
+│   ├── roomController.js        # Room CRUD, availability queries, pagination
+│   ├── bookingController.js     # Double-booking check, price calculation, auto-complete
+│   └── paymentController.js     # Payment recording, bill generation, extras handling
 │
-├── middleware/                   # Request processing
-│   ├── auth.js                  # JWT verification
-│   └── validation.js            # Input validation rules
+├── middleware/                  # Request processing layer
+│   ├── auth.js                  # Bearer token verification
+│   └── validation.js            # Input sanitization & validation rules
 │
-├── routes/                       # API endpoints
+├── routes/                      # RESTful endpoint definitions
 │   ├── authRoutes.js            # POST /api/auth/login
-│   ├── roomRoutes.js            # /api/rooms (CRUD + availability)
-│   ├── bookingRoutes.js         # /api/bookings (CRUD + cancel)
-│   └── paymentRoutes.js         # /api/payments (record + bill)
+│   ├── roomRoutes.js            # GET, POST, PUT, DELETE /api/rooms (+ /availability)
+│   ├── bookingRoutes.js         # GET, POST, PUT, DELETE /api/bookings
+│   └── paymentRoutes.js         # GET, POST /api/payments (+ /bill/:id)
 │
-├── public/                       # Admin dashboard
-│   └── index.html               # Simple UI for API demonstration
+├── public/                      # Admin dashboard SPA
+│   └── index.html               # Real-time UI for API demonstration
 │
 ├── sql/
-│   └── schema.sql               # Complete database schema
+│   └── schema.sql               # Database creation script, indexes & sample data
 │
-├── .env                          # Environment variables (not committed)
-├── .gitignore
-├── package.json
-├── server.js                     # Application entry point
-└── README.md
+├── .env.example                 # Environment variable template
+├── .gitignore                   # Excluded dependencies and secrets
+├── package.json                 # Project dependencies and npm scripts
+├── server.js                    # Express application entry point
+└── README.md                    # System documentation
 ```
 
-## 🔐 Core Backend Features
+---
 
-### 1. Authentication System
-- **JWT-based authentication** with 8-hour expiry
-- **bcrypt password hashing** – no plain-text storage
-- **Protected routes** – all APIs require valid token
-- **Environment variables** for sensitive configuration
+## 🔐 Core Backend Features & Business Logic
+
+### 1. Authentication & Security
+- Password stored using **bcrypt** salt hashing (`$2b$10$...`).
+- **JWT token** generated upon login containing payload `{ id, email, role }`.
+- Route protection enforced via `Bearer <token>` HTTP headers.
 
 ---
 
@@ -99,135 +131,225 @@ hotel-management-system/
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/rooms` | GET | Get rooms (paginated: `?page=1&limit=10`) |
-| `/api/rooms/availability` | GET | Get available rooms for date range |
-| `/api/rooms/:id` | GET | Get single room |
-| `/api/rooms` | POST | Create new room |
-| `/api/rooms/:id` | PUT | Update room |
-| `/api/rooms/:id` | DELETE | Delete room (fails if has bookings) |
-
-**Features:**
-- Pagination support for large datasets
-- Filter by room type
-- Search by room number
-- Sort by any column (ID, number, type, price)
+| `/api/rooms` | GET | Get rooms with pagination (`?page=1&limit=10`) |
+| `/api/rooms/availability` | GET | Check room availability for date range (`?check_in=YYYY-MM-DD&check_out=YYYY-MM-DD`) |
+| `/api/rooms/:id` | GET | Get single room by ID |
+| `/api/rooms` | POST | Create new room (requires `room_number`, `type`, `price_per_night`) |
+| `/api/rooms/:id` | PUT | Update room details |
+| `/api/rooms/:id` | DELETE | Delete room (prevented if active bookings exist) |
 
 ---
 
-### 3. Booking System (Core Logic)
+### 3. Booking Engine & Business Rules
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/bookings` | GET | Get bookings (filter by status) |
-| `/api/bookings/:id` | GET | Get single booking |
-| `/api/bookings` | POST | Create booking |
-| `/api/bookings/:id` | PUT | Update booking |
-| `/api/bookings/:id` | DELETE | Cancel booking |
+| `/api/bookings` | GET | List bookings (filterable by status: `confirmed`, `cancelled`, `completed`) |
+| `/api/bookings/:id` | GET | Fetch booking details |
+| `/api/bookings` | POST | Create new booking |
+| `/api/bookings/:id` | PUT | Update booking dates/room (re-calculates price and re-verifies availability) |
+| `/api/bookings/:id` | DELETE | Soft cancel booking (retains record for auditing) |
 
-**Business Logic Implemented:**
-
-| ✅ | Feature | Description |
-|----|---------|-------------|
-| ✅ | **Double-booking prevention** | SQL query checks overlapping dates |
-| ✅ | **Automatic price calculation** | Nights × room price per night |
-| ✅ | **Date validation** | Check-in cannot be in past, check-out must be after check-in |
-| ✅ | **Booking status management** | confirmed → completed (auto after check-out) |
-| ✅ | **Soft delete** | Cancelled bookings remain in database for records |
+**Key Business Rules Implemented:**
+- **Double-Booking Prevention**:
+  ```sql
+  SELECT COUNT(*) FROM bookings 
+  WHERE room_id = ? AND status != 'cancelled' 
+  AND check_in < ? AND check_out > ?
+  ```
+- **Automatic Price Computation**: Calculated as `Math.ceil((check_out - check_in) in days) * price_per_night`.
+- **Automatic Completion**: Active bookings past their `check_out` date are dynamically transitioned from `confirmed` to `completed`.
 
 ---
 
-### 4. Billing & Payment System
+### 4. Billing & Payments
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/payments` | POST | Record payment against booking (any amount, room + extras) |
-| `/api/payments` | GET | Fetch all payments |
-| `/api/payments/bill/:bookingId` | GET | Get complete bill |
+| `/api/payments` | POST | Record payment transaction (`booking_id`, `amount`, `payment_method`) |
+| `/api/payments` | GET | Fetch payment ledger |
+| `/api/payments/bill/:id` | GET | Generate itemized bill for booking |
 
 **Features:**
-- Calculate total stay cost (nights × room price per night)
-- **Allow extra payments** – After room price is fully paid, additional amounts are treated as “extras” (e.g., food, drinks, services)
-- Track multiple payments per booking
-- Bill clearly separates **Room Price**, **Additional paid (extras)**, and **Total Paid**
-- Payment methods: cash, card, online
-- No overpayment errors – any positive amount is accepted
+- Multi-payment tracking per booking.
+- Accepts extra payments beyond room cost for additional hotel services (laundry, room service, etc.), surfaced as `Additional paid (extras)`.
+- Prevents negative due amounts.
 
 ---
 
+## 📡 Sample API Request & Response Payloads
 
-### Tables
-
-| Table | Primary Key | Foreign Keys | Description |
-|-------|-------------|--------------|-------------|
-| **users** | id | - | Admin users (authentication) |
-| **rooms** | id | - | Room details + availability status |
-| **bookings** | id | room_id, created_by | Booking records with date range |
-| **payments** | id | booking_id | Payment transactions |
-
+### 🔑 1. Admin Login (`POST /api/auth/login`)
+**Request:**
+```json
+{
+  "email": "tushar@example.com",
+  "password": "admin123"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "Admin",
+    "email": "tushar@example.com",
+    "role": "admin"
+  }
+}
+```
 
 ---
 
-## 🖥️ Admin Dashboard Features
+### 🏨 2. Check Available Rooms (`GET /api/rooms/availability`)
+**Query Parameters:** `?check_in=2026-10-01&check_out=2026-10-05`  
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "room_number": "101",
+      "type": "Standard",
+      "price_per_night": "80.00",
+      "status": "available"
+    },
+    {
+      "id": 3,
+      "room_number": "201",
+      "type": "Deluxe",
+      "price_per_night": "120.00",
+      "status": "available"
+    }
+  ]
+}
+```
 
-The dashboard is a **demonstration UI** to test and showcase backend functionality:
+---
 
-### Room Management View
-- View all rooms with real-time availability status
-- Add new rooms (number, type, price)
-- Delete rooms (validation prevents deletion if has bookings)
-- Filter by room type (Standard/Deluxe/Suite/Presidential)
-- Search by room number
-- Sortable columns (click on headers)
-- Visual status badges (Available/Booked/Free/Maintenance)
+### 📅 3. Create Booking (`POST /api/bookings`)
+**Headers:** `Authorization: Bearer <token>`  
+**Request:**
+```json
+{
+  "guest_name": "John Doe",
+  "guest_email": "john@example.com",
+  "room_id": 1,
+  "check_in": "2026-10-01",
+  "check_out": "2026-10-05"
+}
+```
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 10,
+    "room_id": 1,
+    "guest_name": "John Doe",
+    "guest_email": "john@example.com",
+    "check_in": "2026-10-01",
+    "check_out": "2026-10-05",
+    "total_price": 320.00,
+    "created_by": 1,
+    "status": "confirmed"
+  }
+}
+```
 
-### Booking Creation
-- **Dropdown:**
-  1. Select room type
-  2. Select specific free room (auto-populated)
-- Date pickers for check-in/check-out
-- Automatic total price calculation (backend)
-- Real-time availability check
-  
-### Billing & Payment 
-- Record payments for any confirmed booking
-- **Extras allowed** – even after room price is fully paid, extra payments can be added (food, laundry, etc.)
-- Bill view shows:
-  - Room price
-  - List of all payments with date & method
-  - **Additional paid (extras)** – the amount over the room price
-  - Total paid
-  - Due amount (zero if room price covered)
-- Dropdowns exclude cancelled bookings and show remaining room balance
-- Real‑time refresh after each payment
+---
 
-### Booking Management
-- View all bookings with status badges
-- Filter by status (All/Confirmed/Cancelled/Completed)
-- Cancel active bookings (soft delete)
-- Auto-update completed bookings after check-out date
+### 💳 4. Get Itemized Bill (`GET /api/payments/bill/10`)
+**Headers:** `Authorization: Bearer <token>`  
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "booking": {
+      "id": 10,
+      "guest_name": "John Doe",
+      "guest_email": "john@example.com",
+      "room_number": "101",
+      "type": "Standard",
+      "check_in": "2026-10-01",
+      "check_out": "2026-10-05",
+      "total_price": "320.00"
+    },
+    "payments": [
+      {
+        "id": 1,
+        "booking_id": 10,
+        "amount": "320.00",
+        "payment_method": "card",
+        "payment_date": "2026-09-16T22:30:00.000Z"
+      }
+    ],
+    "total_price": 320,
+    "total_paid": 320,
+    "due_amount": 0
+  }
+}
+```
 
-### Dashboard Highlights
-- Responsive layout
-- Professional color scheme
-- Emoji icons for visual clarity
-- Real-time updates (no page refresh needed)
+---
+
+## 🗄️ Database Schema Design
+
+```text
+ ┌──────────────────────┐        ┌──────────────────────┐
+ │        users         │        │        rooms         │
+ ├──────────────────────┤        ├──────────────────────┤
+ │ id (PK, INT)         │        │ id (PK, INT)         │
+ │ name (VARCHAR)       │        │ room_number (VARCHAR)│
+ │ email (VARCHAR, UNQ) │        │ type (VARCHAR)       │
+ │ password_hash (STR)  │        │ price_per_night (DEC)│
+ │ role (ENUM)          │        │ status (ENUM)        │
+ └──────────┬───────────┘        └──────────┬───────────┘
+            │                               │
+            │ 1:N                           │ 1:N
+            ▼                               ▼
+ ┌──────────────────────────────────────────────────────┐
+ │                       bookings                       │
+ ├──────────────────────────────────────────────────────┤
+ │ id (PK, INT)                                         │
+ │ room_id (FK -> rooms.id)                             │
+ │ created_by (FK -> users.id)                          │
+ │ guest_name / guest_email                             │
+ │ check_in / check_out (DATE)                          │
+ │ total_nights (GENERATED ALWAYS AS DATEDIFF)          │
+ │ total_price (DECIMAL)                                │
+ │ status ('confirmed', 'cancelled', 'completed')       │
+ └──────────────────────────┬───────────────────────────┘
+                            │
+                            │ 1:N
+                            ▼
+ ┌──────────────────────────────────────────────────────┐
+ │                       payments                       │
+ ├──────────────────────────────────────────────────────┤
+ │ id (PK, INT)                                         │
+ │ booking_id (FK -> bookings.id)                       │
+ │ amount (DECIMAL)                                     │
+ │ payment_method ('cash', 'card', 'online')            │
+ │ payment_date (TIMESTAMP)                             │
+ └──────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 🚀 How to Run Locally
 
 ### Prerequisites
-
-Make sure you have installed:
-
-- Node.js (**v16 or higher**)
-- MySQL (**v8 or higher**)
-- Git
+- **Node.js** (v16 or higher)
+- **MySQL Server** (v8 or higher)
+- **Git**
 
 ---
 
-## Step 1: Clone Repository
-
+### Step 1: Clone Repository
 ```bash
 git clone https://github.com/Tushar-Goyal-9/Hotel-Management-System.git
 cd Hotel-Management-System
@@ -235,171 +357,79 @@ cd Hotel-Management-System
 
 ---
 
-## Step 2: Install Dependencies
-
+### Step 2: Install Dependencies
 ```bash
 npm install
 ```
 
 ---
 
-## Step 3: Set Up Database
-
-Open MySQL and run:
-
+### Step 3: Database Setup
+Import `sql/schema.sql` into MySQL:
 ```bash
 mysql -u root -p < sql/schema.sql
 ```
-
-Or if using MySQL Workbench:
-
-- Open `sql/schema.sql`
-- Execute the script
+*Or execute `sql/schema.sql` via MySQL Workbench.*
 
 ---
 
-## Step 4: Configure Environment Variables
-
-Create a `.env` file in the project root:
-
+### Step 4: Environment Configuration
+Copy `.env.example` to create your `.env` file:
+```bash
+cp .env.example .env
+```
+Edit `.env` with your database credentials:
 ```env
 PORT=5000
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
-DB_NAME=your_database_name
+DB_NAME=hotel_management
 JWT_SECRET=your_super_secret_jwt_key_here
 ```
 
 ---
 
-## Step 5: Start Server
+### Step 5: Start the Server
 
-Development mode (auto restart):
-
+**Development Mode** (Auto-restart via Nodemon):
 ```bash
 npm run dev
 ```
 
-Production mode:
-
+**Production Mode**:
 ```bash
 npm start
 ```
 
 ---
 
-## Step 6: Access Application
+### Step 6: Access Dashboard & Default Credentials
+Open `http://localhost:5000` in your web browser.
 
-- **Dashboard:** http://localhost:5000
-
----
-
-# 🔐 Default Admin Credentials
-
-| Field | Value |
-|------|-------|
-| Email | tushar@example.com |
-| Password | admin123 |
+| Field | Default Value |
+|-------|---------------|
+| **Email** | `tushar@example.com` |
+| **Password** | `admin123` |
 
 ---
 
-# 📊 Sample Data (Pre-loaded)
+## ✨ Key Technical Highlights
 
-| Room | Type | Price/Night |
-|------|------|------------|
-| 101 | Standard | $80 |
-| 102 | Standard | $80 |
-| 201 | Deluxe | $120 |
-| 202 | Deluxe | $120 |
-| 301 | Suite | $200 |
+- **Database Constraints**: Foreign keys with `ON DELETE RESTRICT` for referential integrity.
+- **Query Performance**: Indexing on `(room_id, check_in, check_out, status)` speeds up date checking algorithms under high concurrency.
+- **RESTful Best Practices**: Correct HTTP verb usage, JSON content negotiation, and consistent error status codes (`400`, `401`, `403`, `404`, `409`, `500`).
 
 ---
 
-# ✨ Key Backend Concepts Demonstrated
-
-| Concept | Implementation |
-|--------|---------------|
-| RESTful API Design | Proper HTTP methods, status codes, and resource naming |
-| JWT Authentication | Token generation, verification, protected routes |
-| Password Security | bcrypt hashing, no plain-text password storage |
-| Database Normalization | 4 tables with proper relationships |
-| Query Optimization | Composite index for faster availability checks |
-| Double-Booking Prevention | Overlapping date SQL validation |
-| Error Handling | Global error handler with consistent API responses |
-| MVC Architecture | Clear separation of controllers, models, and routes |
-| Extras / Overpayment Handling | Allow additional payments beyond room price, shown as "Additional paid (extras)" in bill |
-
----
-
-
-# 📈 What I Learned
-
-## Backend Development
-
-- Building RESTful APIs with proper architecture
-- Implementing secure authentication using JWT + bcrypt
-- Writing complex SQL queries for availability checking
-- Database design with relationships and constraints
-- Proper error handling and request validation
-- Environment-based configuration management
-
----
-
-## Database Design
-
-- Database normalization principles
-- Eliminating redundant data
-- Foreign key constraints for data integrity
-- Indexing strategies for better query performance
-- Generated columns for automatic calculations
-
----
-
-## Project Management
-
-- Git workflow and version control
-- Development vs production environment setup
-- Preparing backend projects for deployment
-
----
-
-# 👨‍💻 Developer
+## 👨‍💻 Developer
 
 **Tushar Goyal**
-
 - GitHub: [@Tushar-Goyal-9](https://github.com/Tushar-Goyal-9)
 
 ---
 
-# 🚧 Future Enhancements
+## 📄 License
 
-| Feature | Description |
-|--------|-------------|
-| Email Notifications | Send booking confirmations using Nodemailer |
-| Rate Limiting | Prevent API abuse using express-rate-limit |
-| API Versioning | Support versioned endpoints (`/api/v2`) |
-| Logging | Request/response logging using Winston |
-| Unit Testing | Add Jest/Mocha test coverage |
-| Swagger/OpenAPI | Auto-generated API documentation |
-| Refresh Tokens | Better JWT session management |
-| Redis Caching | Cache frequently requested data |
-| WebSocket Notifications | Real-time booking updates |
-
----
-
-# 📄 License
-
-MIT License — Free for learning and commercial use.
-
----
-
-# 🙏 Acknowledgments
-
-- **Express.js** — Minimalist backend web framework
-- **MySQL Community** — Reliable relational database
-- **bcrypt.js** — Secure password hashing
-- **jsonwebtoken** — JWT implementation
-- Open-source contributors
-
----
+This project is licensed under the [MIT License](LICENSE) — free for educational and commercial use.
