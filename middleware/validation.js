@@ -15,7 +15,7 @@ const roomValidation = [
     body('price_per_night').isNumeric().withMessage('Price must be number')
 ];
 
-// Booking validation rules
+// Booking validation rules for creation
 const bookingValidation = [
     body('guest_name').notEmpty(),
     body('guest_email').isEmail(),
@@ -34,9 +34,29 @@ const bookingValidation = [
     })
 ];
 
+// Booking validation rules for updates (supports partial updates & status-only updates)
+const bookingUpdateValidation = [
+    body('guest_name').optional().notEmpty(),
+    body('guest_email').optional().isEmail(),
+    body('room_id').optional().isInt({ min: 1 }),
+    body('check_in').optional().isDate().custom((value, { req }) => {
+        if (new Date(value) < new Date().setHours(0,0,0,0)) {
+            throw new Error('Check-in date cannot be in the past');
+        }
+        return true;
+    }),
+    body('check_out').optional().isDate().custom((value, { req }) => {
+        if (req.body.check_in && new Date(value) <= new Date(req.body.check_in)) {
+            throw new Error('Check-out must be after check-in');
+        }
+        return true;
+    }),
+    body('status').optional().isIn(['confirmed', 'cancelled', 'completed'])
+];
+
 const loginValidation = [
     body('email').isEmail(),
     body('password').notEmpty()
 ];
 
-module.exports = { validate, roomValidation, bookingValidation, loginValidation };
+module.exports = { validate, roomValidation, bookingValidation, bookingUpdateValidation, loginValidation };

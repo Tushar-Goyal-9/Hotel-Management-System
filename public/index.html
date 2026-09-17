@@ -496,7 +496,7 @@
                 let updatedCount = 0;
                 for (const booking of data.data) {
                     if (booking.status === 'confirmed' && booking.check_out < today) {
-                        await fetch(`/api/bookings/${booking.id}`, {
+                        const updateRes = await fetch(`/api/bookings/${booking.id}`, {
                             method: 'PUT',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -504,7 +504,12 @@
                             },
                             body: JSON.stringify({ status: 'completed' })
                         });
-                        updatedCount++;
+                        const updateData = await updateRes.json();
+                        if (updateRes.ok && updateData.success) {
+                            updatedCount++;
+                        } else {
+                            console.error(`Failed to complete booking #${booking.id}:`, updateData.message || updateData.errors);
+                        }
                     }
                 }
                 if (updatedCount > 0) {

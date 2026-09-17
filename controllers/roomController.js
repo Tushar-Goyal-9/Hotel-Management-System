@@ -72,6 +72,9 @@ const deleteRoom = async (req, res) => {
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Room not found' });
         res.json({ success: true, message: 'Room deleted' });
     } catch (err) {
+        if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.errno === 1451) {
+            return res.status(409).json({ success: false, message: 'Cannot delete room because it has existing bookings' });
+        }
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
