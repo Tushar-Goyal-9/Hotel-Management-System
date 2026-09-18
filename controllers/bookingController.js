@@ -145,7 +145,7 @@ const updateBooking = async (req, res) => {
 const cancelBooking = async (req, res) => {
     const { id } = req.params;
     try {
-        const [result] = await pool.query('UPDATE bookings SET status = "cancelled" WHERE id = ? AND status != "cancelled"', [id]);
+        const [result] = await pool.query("UPDATE bookings SET status = 'cancelled' WHERE id = ? AND status != 'cancelled'", [id]);
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Booking not found or already cancelled' });
         res.json({ success: true, message: 'Booking cancelled successfully' });
     } catch (err) {
