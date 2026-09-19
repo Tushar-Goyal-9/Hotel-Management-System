@@ -12,7 +12,7 @@ A **backend-focused** hotel management system built with **Node.js**, **Express.
 
 ## 📌 Project Overview
 
-This project showcases production-grade backend engineering practices:
+This project showcases backend engineering practices:
 
 - 🔐 **JWT Authentication & Security** – Password hashing with `bcryptjs`, environment separation, protected API routes.
 - 🏨 **Room Management API** – Full CRUD operations, filtering by room type, searching, column sorting, and pagination.
