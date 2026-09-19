@@ -6,7 +6,7 @@
 ![JWT](https://img.shields.io/badge/JWT-Authentication-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-A production-ready **backend-focused** hotel management system built with **Node.js**, **Express.js**, and **MySQL**. Includes a **functional single-page admin dashboard** (HTML/CSS/JS) for demonstration, real-time testing, and end-to-end evaluation of all backend features.
+A **backend-focused** hotel management system built with **Node.js**, **Express.js**, and **MySQL**. Includes a **functional single-page admin dashboard** (HTML/CSS/JS) for demonstration, real-time testing, and end-to-end evaluation of all backend features.
 
 ---
 
